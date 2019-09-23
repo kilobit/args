@@ -1,9 +1,11 @@
 ARGS
 ====
 
-A super simple argument processing library for Golang.  This library
-was built out of curiosity and a desire for a simple argument library
-that doesn't impose structure on the calling application.
+A super simple argument processing library for Golang.
+
+This library was built out of curiosity and a desire for a simple
+argument library that doesn't impose structure on the calling
+application.
 
 With compliments to [spf13](https://spf13.com/) for
 [Cobra](https://github.com/spf13/cobra), a really great library. 
@@ -76,6 +78,6 @@ License
 See LICENSE.
 
 --
-Created: Sept 23, 2019
-By: Christian Saunders <cps@kilobit.ca>
+Created: Sept 23, 2019  
+By: Christian Saunders <cps@kilobit.ca>  
 Copyright 2019 Kilobit Labs Inc.
