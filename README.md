@@ -1,7 +1,12 @@
 ARGS
 ====
 
-A super simple argument processing library for Golang.
+A super simple argument processing library for Golang.  This library
+was built out of curiosity and a desire for a simple argument library
+that doesn't impose structure on the calling application.
+
+With compliments to [spf13](https://spf13.com/) for
+[Cobra](https://github.com/spf13/cobra), a really great library. 
 
 Status: In-Development
 
@@ -29,9 +34,13 @@ func main() {
 Features
 --------
 
-- Simple,  unopinionated module that fits your code structure.
-- GNU style option handling.
-- Channel or iterator style interface.
+ - Simple,  unopinionated module that fits your code structure.
+ - GNU style option handling.
+ - Channel or iterator style interface.
+
+In-Progress:
+ - Get the currently unprocessed arguments.
+ - A simple REPL.
 
 Installation
 ------------
