@@ -1,3 +1,3 @@
-module kilobit.ca/args
+module kilobit.ca/go/args
 
 go 1.13
