@@ -1,6 +1,8 @@
 /* Copyright 2019 Kilobit Labs Inc. */
 
-package args
+// Simple argument parsing for Golang.
+//
+package args // import "kilobit.ca/go/args"
 
 import "os"
 import "strings"
@@ -8,15 +10,15 @@ import "unicode/utf8"
 
 type ArgParser struct {
 	shopt bool
-	si uint
-	args []string
+	si    uint
+	args  []string
 }
 
 func NewArgParser(args []string) *ArgParser {
 	if args == nil {
 		args = os.Args[1:]
 	}
-	
+
 	return &ArgParser{false, 0, args}
 }
 
@@ -45,7 +47,7 @@ func (ap *ArgParser) NextArg() string {
 
 // Channel version of the NextArg method, useful for looping.
 //
-func(ap *ArgParser) NextArgC() chan string {
+func (ap *ArgParser) NextArgC() chan string {
 	c := make(chan string)
 
 	go func() {
@@ -78,7 +80,7 @@ func (ap *ArgParser) NextOpt() string {
 
 	arg := ap.args[0]
 	switch {
-		
+
 	case strings.HasPrefix(arg, "--"):
 		opt := arg[2:]
 		ap.args = ap.args[1:]
@@ -100,7 +102,7 @@ func (ap *ArgParser) nextShopt() string {
 	if len(ap.args) == 0 {
 		return ""
 	}
-	
+
 	arg := ap.args[0]
 
 	// Test if there are more shopts.
@@ -120,7 +122,7 @@ func (ap *ArgParser) nextShopt() string {
 
 // Channel version of the NextOpt method, useful for looping.
 //
-func(ap *ArgParser) NextOptC() chan string {
+func (ap *ArgParser) NextOptC() chan string {
 	c := make(chan string)
 
 	go func() {

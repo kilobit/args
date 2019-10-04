@@ -1,6 +1,6 @@
 /* Copyright 2019 Kilobit Labs Inc. */
 
-package args
+package args // import "kilobit.ca/go/args"
 
 import "testing"
 import "strings"
@@ -16,12 +16,10 @@ func TestArgsTest(t *testing.T) {
 var ocoargs map[string][]string = map[string][]string{
 
 	// Golden path test.
-	"/foo/bar -1 -2 -3 -456 command -7 -89":
-	toSlice("1", "2", "3", "4", "5", "6", "command", "7", "8", "9"),
+	"/foo/bar -1 -2 -3 -456 command -7 -89": toSlice("1", "2", "3", "4", "5", "6", "command", "7", "8", "9"),
 
 	// - stops option parsing.
-	"/foo/bar -123 foo -":
-	toSlice("1", "2", "3", "foo"),
+	"/foo/bar -123 foo -": toSlice("1", "2", "3", "foo"),
 }
 
 func toSlice(ss ...string) []string {
