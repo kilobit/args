@@ -56,3 +56,26 @@ func TestOptCmdOpt(t *testing.T) {
 		check(t, argset, r)
 	}
 }
+
+func TestArgParserArgs(t *testing.T) {
+
+	args := strings.Split("This is a set of 7 arguments", " ")
+	p := NewArgParser(args)
+
+	if len(p.Args()) != 7 {
+		t.Error("Expected 7 arguments remaining.")
+	}
+
+	p.NextArg()
+
+	if len(p.Args()) != 6 {
+		t.Error("Expected 6 arguments remaining.")
+	}
+
+	for range p.NextArgC() {
+	}
+
+	if len(p.Args()) != 0 {
+		t.Error("Expected 0 arguments remaining.")
+	}
+}

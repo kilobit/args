@@ -22,6 +22,16 @@ func NewArgParser(args []string) *ArgParser {
 	return &ArgParser{false, 0, args}
 }
 
+// Get the remaining arguments.
+//
+func (ap *ArgParser) Args() []string {
+
+	args := make([]string, len(ap.args))
+	copy(args, ap.args)
+
+	return args
+}
+
 // Peek at the next argument.
 //
 func (ap *ArgParser) PeekArg() string {
