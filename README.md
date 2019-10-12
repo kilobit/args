@@ -63,8 +63,6 @@ Features
  - GNU style option handling.
  - Channel or iterator style interface.
  - A simple REPL.
-
-In-Progress:
  - Get the currently unprocessed arguments.
 
 Installation
