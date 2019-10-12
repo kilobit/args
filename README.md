@@ -13,7 +13,7 @@ With compliments to [spf13](https://spf13.com/) for
 Status: In-Development
 
 ```{.go}
-import "kilobit.ca/args"
+import "kilobit.ca/go/args"
 
 func main() {
 
@@ -33,16 +33,39 @@ func main() {
 }
 ```
 
+```{.go}
+import "kilobit.ca/go/args"
+
+func echo(ap *args.ArgParser) bool {
+
+	var args []string
+	for arg := range ap.NextArgC {
+		args = append(args, arg)
+	}
+	
+	fmt.Println(args)
+	
+	return true
+}
+
+func main() {
+	
+	repl := args.NewREPL(nil, nil, REPLOptPrompt("$ "))
+	
+	repl.Run(echo)
+}
+```
+
 Features
 --------
 
  - Simple,  unopinionated module that fits your code structure.
  - GNU style option handling.
  - Channel or iterator style interface.
+ - A simple REPL.
 
 In-Progress:
  - Get the currently unprocessed arguments.
- - A simple REPL.
 
 Installation
 ------------

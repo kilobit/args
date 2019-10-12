@@ -19,7 +19,7 @@ this is the second line
 func TestREPL(t *testing.T) {
 
 	r := strings.NewReader(replscript)
-	repl := NewREPL(r)
+	repl := NewREPL(r, nil, REPLOptPrompt(""))
 
 	err := repl.Run(func(ap *ArgParser) bool {
 
