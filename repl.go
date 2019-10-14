@@ -29,11 +29,21 @@ func REPLOptPrompt(prompt string) REPLOpt {
 	}
 }
 
+// Interface for a REPL Handler.
+//
+type REPLHandler interface {
+	HandleCmd(ap *ArgParser) bool
+}
+
 // A handler function type for processing repl commands.
 //
 // End processing by returning false.
 //
-type REPLHandler func(ap *ArgParser) bool
+type REPLHandlerFunc func(ap *ArgParser) bool
+
+func (f REPLHandlerFunc) HandleCmd(ap *ArgParser) bool {
+	return f(ap)
+}
 
 // Create a new REPL.
 //
@@ -79,7 +89,7 @@ func (repl *REPL) SetPrompt(prompt string) {
 
 // Run the REPL.
 //
-func (repl *REPL) Run(f REPLHandler) error {
+func (repl *REPL) Run(handler REPLHandler) error {
 
 	scanner := bufio.NewScanner(repl.br)
 
@@ -98,7 +108,7 @@ func (repl *REPL) Run(f REPLHandler) error {
 		args := strings.Fields(line)
 		ap := NewArgParser(args)
 
-		r = f(ap)
+		r = handler.HandleCmd(ap)
 		if !r {
 			break
 		}

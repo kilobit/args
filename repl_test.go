@@ -21,7 +21,7 @@ func TestREPL(t *testing.T) {
 	r := strings.NewReader(replscript)
 	repl := NewREPL(r, nil, REPLOptPrompt(""))
 
-	err := repl.Run(func(ap *ArgParser) bool {
+	var hndlr REPLHandlerFunc = func(ap *ArgParser) bool {
 
 		var args []string
 		for arg := range ap.NextArgC() {
@@ -35,7 +35,9 @@ func TestREPL(t *testing.T) {
 		}
 
 		return true
-	})
+	}
+
+	err := repl.Run(hndlr)
 
 	if err != nil {
 		t.Error(err)
