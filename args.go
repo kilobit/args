@@ -39,18 +39,34 @@ func (ap *ArgParser) PeekArg() string {
 		return ""
 	}
 
-	return ap.args[0]
+	return ap.args[0][ap.si:]
 }
 
-// Returns the whole next argument or nil.
+// Returns the whole next argument or the empty string.
+//
+// Note that if NextArg is called after a short option, it will
+// terminate the short option parsing and treat the remaining
+// characters as the following argument.
+//
+// e.g. -nfoo would be interpreted as 'foo' if NextArg is called
+// immediately after the NextOpt return 'n'.
 //
 func (ap *ArgParser) NextArg() string {
+	ap.shopt = false
+
 	if len(ap.args) == 0 {
 		return ""
 	}
 
-	arg := ap.args[0]
+	if len(ap.args[0]) <= (int)(ap.si) {
+		ap.args = ap.args[1:]
+		ap.si = 0
+	}
+
+	arg := ap.args[0][ap.si:]
 	ap.args = ap.args[1:]
+
+	ap.si = 0
 
 	return arg
 }
@@ -75,7 +91,7 @@ func (ap *ArgParser) NextArgC() chan string {
 	return c
 }
 
-// Returns the next option or nil.
+// Returns the next option or the empty string.
 //
 // Note: Supports gnu style long and short opts.
 //

@@ -5,6 +5,13 @@ package args // import "kilobit.ca/go/args"
 import "testing"
 import "strings"
 
+func Expect(t *testing.T, expected interface{}, actual interface{}) {
+
+	if expected != actual {
+		t.Errorf("Expected %v, Got %v", expected, actual)
+	}
+}
+
 func TestArgsTest(t *testing.T) {
 
 	if true != true {
@@ -78,4 +85,35 @@ func TestArgParserArgs(t *testing.T) {
 	if len(p.Args()) != 0 {
 		t.Error("Expected 0 arguments remaining.")
 	}
+}
+
+func TestOptWithArgs(t *testing.T) {
+
+	args := strings.Split("--fmt json -z mdt", " ")
+	p := NewArgParser(args)
+
+	opt1 := p.NextOpt()
+	val1 := p.NextArg()
+
+	Expect(t, "fmt", opt1)
+	Expect(t, "json", val1)
+
+	opt2 := p.NextOpt()
+	val2 := p.NextArg()
+
+	Expect(t, "z", opt2)
+	Expect(t, "mdt", val2)
+}
+
+func TestOptWithArg(t *testing.T) {
+
+	args := strings.Split("-nfoo remain", " ")
+	p := NewArgParser(args)
+
+	opt := p.NextOpt()
+	arg := p.NextArg()
+
+	Expect(t, "n", opt)
+	Expect(t, "foo", arg)
+	Expect(t, "remain", p.Args()[0])
 }
