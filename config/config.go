@@ -13,6 +13,25 @@ import "encoding/json"
 
 type Config map[string]interface{}
 
+func (c *Config) Write(w io.Writer) error {
+
+	enc := json.NewEncoder(w)
+	return enc.Encode(c)
+}
+
+func (c *Config) WriteFile(filename string) error {
+
+	f, err := os.OpenFile(filename, os.O_RDWR|os.O_CREATE, 0600)
+	if err != nil {
+
+		return err
+	}
+
+	defer f.Close()
+
+	return c.Write(f)
+}
+
 func Load(r io.Reader) (*Config, error) {
 
 	c := Config{}

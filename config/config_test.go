@@ -5,6 +5,7 @@ package config // import "kilobit.ca/go/args/config"
 import "os"
 import "io/ioutil"
 import "strings"
+import "unicode"
 import "testing"
 import "kilobit.ca/go/tested/assert"
 
@@ -18,11 +19,68 @@ var loadTests = []struct {
 	exc    *Config
 	haserr bool
 }{
-	{"{\"foo\": \"bar\"}", &Config{"foo": "bar"}, false},
-	{"{\"foo\": \"bar\"}\n", &Config{"foo": "bar"}, false},
-	{"{\"foo\": {\"bing\": \"bong\"}}", &Config{"foo": map[string]interface{}{"bing": "bong"}}, false},
+	{"{\"foo\":\"bar\"}", &Config{"foo": "bar"}, false},
+	{"{\"foo\":\"bar\"}\n", &Config{"foo": "bar"}, false},
+	{"{\"foo\":{\"bing\":\"bong\"}}", &Config{"foo": map[string]interface{}{"bing": "bong"}}, false},
 	{"52", &Config{}, true},
 	{"[1, 2, 3, 4,]", &Config{}, true},
+}
+
+func TestConfigWrite(t *testing.T) {
+
+	for _, data := range loadTests {
+
+		if data.haserr {
+			continue
+		}
+
+		var w strings.Builder
+		err := data.exc.Write(&w)
+		if err != nil {
+			t.Error(err)
+		}
+
+		/*
+			t.Logf("%#v\n", strings.TrimFunc(data.s, unicode.IsSpace))
+			t.Logf("%#v\n", strings.TrimFunc(w.String(), unicode.IsSpace))
+		*/
+
+		assert.Expect(
+			t,
+			strings.TrimFunc(data.s, unicode.IsSpace),
+			strings.TrimFunc(w.String(), unicode.IsSpace),
+		)
+	}
+}
+
+func TestConfigWriteFile(t *testing.T) {
+
+	for _, data := range loadTests {
+
+		if data.haserr {
+			continue
+		}
+
+		f, err := ioutil.TempFile("", "writefile_test")
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		//defer os.Remove(f.Name()) // Cleanup
+
+		f.Close()
+
+		if err := data.exc.WriteFile(f.Name()); err != nil {
+			t.Fatal(err)
+		}
+
+		c, err := FromFile(f.Name())
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		assert.ExpectDeep(t, data.exc, c)
+	}
 }
 
 func TestConfigLoad(t *testing.T) {
