@@ -8,10 +8,8 @@ package config // import "kilobit.ca/go/args/config"
 
 import "io"
 import "os"
+import "os/signal"
 import "encoding/json"
-import "log"
-
-var logger *log.Logger = log
 
 type Config map[string]interface{}
 
@@ -34,4 +32,39 @@ func FromFile(filename string) (*Config, error) {
 	defer f.Close()
 
 	return Load(f)
+}
+
+// Re-parse a config when a signal is received.
+//
+// Default signal is SIGUSR1.  Returns a channel of Config objects, on
+// error a nil pointer will be passed on the channel and no other
+// signals will be processed.
+//
+// On windows SIGHUP will be used instead.
+//
+func Watch(filename string, sig ...os.Signal) chan *Config {
+
+	confs := make(chan *Config, 1)
+	if len(sig) == 0 {
+		sig = []os.Signal{DEFAULT_SIGNAL}
+	}
+
+	sigs := make(chan os.Signal, 1)
+
+	signal.Notify(sigs, sig...)
+
+	go func() {
+
+		<-sigs
+
+		c, err := FromFile(filename)
+		if err != nil {
+			signal.Reset(sig...)
+			return
+		}
+
+		confs <- c
+	}()
+
+	return confs
 }

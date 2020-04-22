@@ -59,3 +59,33 @@ func TestConfigFromFile(t *testing.T) {
 		assert.Expect(t, data.haserr, err != nil)
 	}
 }
+
+func TestConfigWatch(t *testing.T) {
+
+	data := loadTests[0]
+
+	f, err := ioutil.TempFile("", "fromfile_test")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	defer os.Remove(f.Name()) // Cleanup
+
+	if _, err := f.Write([]byte(data.s)); err != nil {
+		t.Fatal(err)
+	}
+
+	confs := Watch(f.Name())
+
+	proc, err := os.FindProcess(os.Getpid())
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	proc.Signal(DEFAULT_SIGNAL)
+
+	c := <-confs
+
+	assert.ExpectDeep(t, data.exc, c)
+	assert.Expect(t, data.haserr, err != nil)
+}
