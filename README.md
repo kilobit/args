@@ -99,6 +99,9 @@ Features
  - Load json based configuration files.
  - Signal based configuration watcher.
  - Write configs back to json files.
+ 
+ Future:
+ 
  - [ ] Use non-json files for configs.
 
 Installation
