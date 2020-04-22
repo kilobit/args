@@ -9,6 +9,9 @@ package config // import "kilobit.ca/go/args/config"
 import "io"
 import "os"
 import "encoding/json"
+import "log"
+
+var logger *log.Logger = log
 
 type Config map[string]interface{}
 
@@ -27,6 +30,8 @@ func FromFile(filename string) (*Config, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	defer f.Close()
 
 	return Load(f)
 }
