@@ -74,6 +74,19 @@ func main() {
 }
 ```
 
+```{.go}
+import "kilobit.ca/go/args/config"
+
+func main() {
+
+	c, _ := config.FromFile("myconfig.json")
+
+	c['foo'] = "bar"
+	
+	c.WriteFile("myconfig.json")
+}
+```
+
 
 Features
 --------
@@ -85,6 +98,8 @@ Features
  - Get the currently unprocessed arguments.
  - Load json based configuration files.
  - Signal based configuration watcher.
+ - Write configs back to json files.
+ - [ ] Use non-json files for configs.
 
 Installation
 ------------
