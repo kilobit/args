@@ -56,6 +56,25 @@ func main() {
 }
 ```
 
+```{.go}
+import "kilobit.ca/go/args/config"
+
+func main() {
+
+	c, _ := config.FromFile("myconfig.json")
+
+	confs := config.Watch("myconfig.json")
+
+	for {
+		conf := <- confs
+
+		// update running config
+	}
+
+}
+```
+
+
 Features
 --------
 
@@ -64,6 +83,8 @@ Features
  - Channel or iterator style interface.
  - A simple REPL.
  - Get the currently unprocessed arguments.
+ - Load json based configuration files.
+ - Signal based configuration watcher.
 
 Installation
 ------------
