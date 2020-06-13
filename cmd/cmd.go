@@ -15,6 +15,21 @@ type Validator func(value string) error
 
 func Any(value string) error { return nil }
 
+func OneOf(opts ...string) Validator {
+
+	m := map[string]struct{}{}
+	for _, opt := range opts {
+		m[opt] = struct{}{}
+	}
+
+	return func(value string) error {
+		if _, ok := m[value]; !ok {
+			return fmt.Errorf("Invalid parameter, %s", value)
+		}
+		return nil
+	}
+}
+
 // Type representing an Opt arg or and Arg.
 //
 // A nil Validator when used as an Opt indicates a boolean flag.

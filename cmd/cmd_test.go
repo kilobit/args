@@ -62,3 +62,34 @@ func TestCommandRunArgs(t *testing.T) {
 	err := cmd.Run([]string{"--verbose", "-f", "bar", "Hello World!", "rest1", "rest2"})
 	assert.ExpectDeep(t, errors.New(""), err)
 }
+
+func TestOneOfValidator(t *testing.T) {
+
+	v := OneOf("one", "two", "three")
+
+	if err := v("one"); err != nil {
+		t.Error(err)
+	}
+
+	if err := v("two"); err != nil {
+		t.Error(err)
+	}
+
+	if err := v("three"); err != nil {
+		t.Error(err)
+	}
+
+	if err := v("four"); err == nil {
+		t.Error("Expected error for invalid input, 'four'.")
+	}
+
+}
+
+func TestOneOfEmptyValidator(t *testing.T) {
+
+	v := OneOf()
+
+	if err := v("any"); err == nil {
+		t.Error("Expected error for invalid input, 'any'.")
+	}
+}
