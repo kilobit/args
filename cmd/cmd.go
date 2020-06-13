@@ -51,20 +51,32 @@ func NewParam(name, desc string, v Validator) *Param {
 //
 type ValueMap map[string]string
 
-// A function type that performs the Command action.
+// Interface for running Command actions.  Can also be satisfied with
+// a CmdHandler.
+//
+type CmdRunner interface {
+	RunCommand(params ValueMap, rest []string) error
+}
+
+// A function type that performs the Command action.  This type
+// satisfies the CmdRunner interface.
 //
 // The params is a map of the named options and args.
 //
-type CmdHandler func(params ValueMap, rest []string) error
+type CmdRunnerFunc func(params ValueMap, rest []string) error
+
+func (h CmdRunnerFunc) RunCommand(params ValueMap, rest []string) error {
+	return h(params, rest)
+}
 
 // Type representing a command, it's parameters and meta data.
 //
 type Command struct {
-	name    string
-	desc    string
-	opts    map[string]*Param
-	args    []*Param
-	handler CmdHandler
+	name   string
+	desc   string
+	opts   map[string]*Param
+	args   []*Param
+	runner CmdRunner
 }
 
 func (cmd *Command) HasOpt(name string) (*Param, bool) {
@@ -96,9 +108,9 @@ func (cmd *Command) AddArgs(args ...*Param) {
 	cmd.args = append(cmd.args, args...)
 }
 
-func New(name, desc string, handler CmdHandler) *Command {
+func New(name, desc string, runner CmdRunner) *Command {
 
-	cmd := Command{name, desc, map[string]*Param{}, []*Param{}, handler}
+	cmd := Command{name, desc, map[string]*Param{}, []*Param{}, runner}
 
 	return &cmd
 }
@@ -145,5 +157,5 @@ func (cmd *Command) Run(args []string) error {
 		params[arg.name] = param
 	}
 
-	return cmd.handler(params, ap.Args())
+	return cmd.runner.RunCommand(params, ap.Args())
 }

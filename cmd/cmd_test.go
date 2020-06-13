@@ -11,13 +11,13 @@ func TestCommandTest(t *testing.T) {
 	assert.Expect(t, true, true)
 }
 
-func cmdHandler(params ValueMap, rest []string) error {
+var noprunner CmdRunnerFunc = func(params ValueMap, rest []string) error {
 	return nil
 }
 
 func TestCommandRun(t *testing.T) {
 
-	cmd := New("test", "A test command.", cmdHandler)
+	cmd := New("test", "A test command.", noprunner)
 	err := cmd.Run([]string{})
 	if err != nil {
 		t.Error(err)
@@ -26,7 +26,7 @@ func TestCommandRun(t *testing.T) {
 
 func TestCommandRunArgs(t *testing.T) {
 
-	cmd := New("test", "Another test command.", func(params ValueMap, rest []string) error {
+	var runner CmdRunnerFunc = func(params ValueMap, rest []string) error {
 
 		//t.Logf("params: %s", params)
 		//t.Logf("rest:   %s", rest)
@@ -53,7 +53,9 @@ func TestCommandRunArgs(t *testing.T) {
 		assert.ExpectDeep(t, []string{"rest1", "rest2"}, rest)
 
 		return errors.New("")
-	})
+	}
+
+	cmd := New("test", "Another test command.", runner)
 
 	cmd.AddOpt(NewParam("verbose", "Test verbose output.", nil), "v")
 	cmd.AddOpt(NewParam("foo", "a whole lot of foo", Any), "f")
