@@ -13,7 +13,14 @@ import . "kilobit.ca/go/args"
 //
 type Validator func(value string) error
 
-// Type representing an Opt arg or and Arg
+func Any(value string) error { return nil }
+
+// Type representing an Opt arg or and Arg.
+//
+// A nil Validator when used as an Opt indicates a boolean flag.
+//
+// A nil validator when used as an Arg indicates that no validation
+// will be done on the parameter value.
 //
 type Param struct {
 	name string
@@ -21,15 +28,8 @@ type Param struct {
 	v    Validator
 }
 
-func NewArg(name, desc string, v Validator) *Param {
+func NewParam(name, desc string, v Validator) *Param {
 	return &Param{name, desc, v}
-}
-
-// Type representing an Option.
-//
-type Option struct {
-	hasArg bool
-	Param
 }
 
 // Mapping of a Param name to it's assigned value.
@@ -47,12 +47,12 @@ type CmdHandler func(params ValueMap, rest []string) error
 type Command struct {
 	name    string
 	desc    string
-	opts    map[string]*Option
+	opts    map[string]*Param
 	args    []*Param
 	handler CmdHandler
 }
 
-func (cmd *Command) HasOpt(name string) (*Option, bool) {
+func (cmd *Command) HasOpt(name string) (*Param, bool) {
 	p, ok := cmd.opts[name]
 	return p, ok
 }
@@ -61,7 +61,7 @@ func (cmd *Command) HasOpt(name string) (*Option, bool) {
 //
 // Note that the Option name will be added automatically.
 //
-func (cmd *Command) AddOpt(opt *Option, aliases ...string) error {
+func (cmd *Command) AddOpt(opt *Param, aliases ...string) error {
 
 	names := append([]string{opt.name}, aliases...)
 
@@ -83,11 +83,15 @@ func (cmd *Command) AddArgs(args ...*Param) {
 
 func New(name, desc string, handler CmdHandler) *Command {
 
-	cmd := Command{name, desc, map[string]*Option{}, []*Param{}, handler}
+	cmd := Command{name, desc, map[string]*Param{}, []*Param{}, handler}
 
 	return &cmd
 }
 
+// Run a command via it's handler.
+//
+// A nil args will default to os.Args.
+//
 func (cmd *Command) Run(args []string) error {
 
 	ap := NewArgParser(args)
@@ -100,16 +104,15 @@ func (cmd *Command) Run(args []string) error {
 		}
 
 		arg := ""
-		if opt.hasArg {
+		if opt.v != nil {
 			arg = ap.NextArg()
+			err := opt.v(arg)
+			if err != nil {
+				return fmt.Errorf("Option error, %s: %s", n, err)
+			}
 		}
 
-		err := opt.v(arg)
-		if err != nil {
-			return fmt.Errorf("Option error, %s: %s", n, err)
-		}
-
-		params[n] = arg
+		params[opt.name] = arg
 	}
 
 	// Check number of arguments.
@@ -117,9 +120,11 @@ func (cmd *Command) Run(args []string) error {
 	for _, arg := range cmd.args {
 
 		param := ap.NextArg()
-		err := arg.v(param)
-		if err != nil {
-			return fmt.Errorf("Argument error, %s: %s", arg.name, err)
+		if arg.v != nil {
+			err := arg.v(param)
+			if err != nil {
+				return fmt.Errorf("Argument error, %s: %s", arg.name, err)
+			}
 		}
 
 		params[arg.name] = param
