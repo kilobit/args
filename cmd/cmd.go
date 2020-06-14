@@ -7,6 +7,7 @@ package cmd // import "kilobit.ca/go/args/cmd"
 import "fmt"
 import _ "errors"
 
+import "strings"
 import . "kilobit.ca/go/args"
 
 // Check a given parameter to make sure it is of the correct type etc.
@@ -157,4 +158,41 @@ func Parse(cmd []string, opts Opts, args *Args) (params ValueMap, rest []string,
 	}
 
 	return params, ap.Args(), nil
+}
+
+// Usage
+func Usage(name, desc string, opts Opts, args *Args) string {
+
+	sb := &strings.Builder{}
+
+	fmt.Fprintf(sb, "\n%s - %s\n\n", name, desc)
+
+	fmt.Fprintf(sb, "Usage: %s", name)
+	if len(opts) > 0 {
+		fmt.Fprint(sb, " [OPTIONS]")
+	}
+	for _, arg := range *args {
+		fmt.Fprintf(sb, " %s", arg.name)
+	}
+	fmt.Fprintf(sb, "\n\n")
+
+	fmt.Fprintf(sb, "Where OPTIONS include:\n\n")
+
+	for name, opt := range opts {
+
+		if len(name) == 1 {
+			fmt.Fprintf(sb, "\t-%-10s\t%s\n", name, opt.desc)
+		} else {
+			fmt.Fprintf(sb, "\t--%-10s\t%s\n", name, opt.desc)
+		}
+
+	}
+
+	fmt.Fprintf(sb, "\nArguments:\n\n")
+
+	for _, arg := range *args {
+		fmt.Fprintf(sb, "\t%-10s\t%s\n", arg.name, arg.desc)
+	}
+
+	return sb.String()
 }
