@@ -17,7 +17,7 @@ var noprunner CmdRunnerFunc = func(params ValueMap, rest []string) error {
 
 func TestCommandRun(t *testing.T) {
 
-	cmd := New("test", "A test command.", noprunner)
+	cmd := New("test", "A test command.", NewOpts(), NewArgs(), noprunner)
 	err := cmd.Run([]string{})
 	if err != nil {
 		t.Error(err)
@@ -55,11 +55,13 @@ func TestCommandRunArgs(t *testing.T) {
 		return errors.New("")
 	}
 
-	cmd := New("test", "Another test command.", runner)
+	opts := NewOpts().
+		Add(NewParam("verbose", "Test verbose output.", nil), "v").
+		Add(NewParam("foo", "a whole lot of foo", Any), "f")
 
-	cmd.AddOpt(NewParam("verbose", "Test verbose output.", nil), "v")
-	cmd.AddOpt(NewParam("foo", "a whole lot of foo", Any), "f")
-	cmd.AddArgs(NewParam("hello", "A test argument", nil))
+	args := NewArgs(NewParam("hello", "A test argument", nil))
+
+	cmd := New("test", "Another test command.", opts, args, runner)
 
 	err := cmd.Run([]string{"--verbose", "-f", "bar", "Hello World!", "rest1", "rest2"})
 	assert.ExpectDeep(t, errors.New(""), err)

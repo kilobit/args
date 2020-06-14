@@ -131,43 +131,14 @@ func (h CmdRunnerFunc) RunCommand(params ValueMap, rest []string) error {
 type Command struct {
 	name   string
 	desc   string
-	opts   map[string]*Param
-	args   []*Param
+	opts   Opts
+	args   *Args
 	runner CmdRunner
 }
 
-func (cmd *Command) HasOpt(name string) (*Param, bool) {
-	p, ok := cmd.opts[name]
-	return p, ok
-}
+func New(name, desc string, opts Opts, args *Args, runner CmdRunner) *Command {
 
-// Add and option to the command.
-//
-// Note that the Option name will be added automatically.
-//
-func (cmd *Command) AddOpt(opt *Param, aliases ...string) error {
-
-	names := append([]string{opt.name}, aliases...)
-
-	for _, name := range names {
-		if _, ok := cmd.opts[name]; ok {
-			return fmt.Errorf("Duplicate option, %s", name)
-		}
-
-		cmd.opts[name] = opt
-	}
-
-	return nil
-}
-
-func (cmd *Command) AddArgs(args ...*Param) {
-
-	cmd.args = append(cmd.args, args...)
-}
-
-func New(name, desc string, runner CmdRunner) *Command {
-
-	cmd := Command{name, desc, map[string]*Param{}, []*Param{}, runner}
+	cmd := Command{name, desc, opts, args, runner}
 
 	return &cmd
 }
@@ -179,7 +150,7 @@ func New(name, desc string, runner CmdRunner) *Command {
 func (cmd *Command) Run(args []string) error {
 
 	ap := NewArgParser(args)
-	params := map[string]string{}
+	params := ValueMap{}
 
 	for n := range ap.NextOptC() {
 		opt, ok := cmd.opts[n]
@@ -201,7 +172,7 @@ func (cmd *Command) Run(args []string) error {
 
 	// Check number of arguments.
 
-	for _, arg := range cmd.args {
+	for _, arg := range *cmd.args {
 
 		param := ap.NextArg()
 		if arg.v != nil {
