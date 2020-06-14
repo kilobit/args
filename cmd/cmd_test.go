@@ -107,9 +107,34 @@ func TestOpts(t *testing.T) {
 
 	//t.Logf("%#v", opts)
 
-	assert.Expect(t, (*opts)["opt1"], opt1)
-	assert.Expect(t, (*opts)["opt2"], opt2)
-	assert.Expect(t, (*opts)["1"], opt1)
-	assert.Expect(t, (*opts)["2"], opt2)
-	assert.Expect(t, (*opts)["3"], opt2)
+	assert.Expect(t, opts["opt1"], opt1)
+	assert.Expect(t, opts["opt2"], opt2)
+	assert.Expect(t, opts["1"], opt1)
+	assert.Expect(t, opts["2"], opt2)
+	assert.Expect(t, opts["3"], opt2)
+}
+
+func TestArgs(t *testing.T) {
+
+	arg1 := NewParam("arg1", "First Argument.", nil)
+	arg2 := NewParam("arg2", "Second Argument.", nil)
+	arg3 := NewParam("arg3", "Third Argument.", nil)
+	arg4 := NewParam("arg4", "Fourth Argument.", nil)
+
+	args := NewArgs(arg1).Add(arg2, arg3)
+
+	args.Add(arg4)
+
+	args.Concat(args)
+
+	//t.Logf("%#v", args)
+
+	assert.Expect(t, (*args)[0], arg1)
+	assert.Expect(t, (*args)[1], arg2)
+	assert.Expect(t, (*args)[2], arg3)
+	assert.Expect(t, (*args)[3], arg4)
+	assert.Expect(t, (*args)[4], arg1)
+	assert.Expect(t, (*args)[5], arg2)
+	assert.Expect(t, (*args)[6], arg3)
+	assert.Expect(t, (*args)[7], arg4)
 }

@@ -54,14 +54,50 @@ func NewParam(name, desc string, v Validator) *Param {
 //
 type Opts map[string]*Param
 
-func (opts Opts) AddOpt(param *Param, aliases ...string) *Opts {
+func (opts Opts) AddOpt(param *Param, aliases ...string) Opts {
 
 	names := append([]string{param.name}, aliases...)
 	for _, name := range names {
 		opts[name] = param
 	}
 
-	return &opts
+	return opts
+}
+
+func (opts Opts) AddOpts(o Opts) Opts {
+
+	for n, p := range o {
+		opts[n] = p
+	}
+
+	return opts
+}
+
+// Type Params contains a set of arguments.
+//
+// Returns Args for chaining.  Use destructuring to concatenate
+// argument lists.
+//
+type Args []*Param
+
+func NewArgs(param ...*Param) *Args {
+	args := (Args)(param)
+	return &args
+}
+
+func (args *Args) Add(param ...*Param) *Args {
+
+	*args = append(*args, param...)
+
+	return args
+}
+
+func (args *Args) Concat(as *Args) *Args {
+
+	params := ([]*Param)(*as)
+	*args = append(*args, params...)
+
+	return args
 }
 
 // Mapping of a Param name to it's assigned value.
