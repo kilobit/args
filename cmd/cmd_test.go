@@ -95,3 +95,21 @@ func TestOneOfEmptyValidator(t *testing.T) {
 		t.Error("Expected error for invalid input, 'any'.")
 	}
 }
+
+func TestOpts(t *testing.T) {
+
+	opt1 := NewParam("opt1", "Test Option 1", nil)
+	opt2 := NewParam("opt2", "Test Option 2", nil)
+
+	opts := Opts{}.AddOpt(opt1, "1", "2")
+
+	opts.AddOpt(opt2, "2", "3")
+
+	//t.Logf("%#v", opts)
+
+	assert.Expect(t, (*opts)["opt1"], opt1)
+	assert.Expect(t, (*opts)["opt2"], opt2)
+	assert.Expect(t, (*opts)["1"], opt1)
+	assert.Expect(t, (*opts)["2"], opt2)
+	assert.Expect(t, (*opts)["3"], opt2)
+}

@@ -47,6 +47,23 @@ func NewParam(name, desc string, v Validator) *Param {
 	return &Param{name, desc, v}
 }
 
+// Type Opts is a mapping of options to names and aliases.
+//
+// Returns the Opts map for chaining.  Duplicate names / aliases will
+// overwrite prior entries.
+//
+type Opts map[string]*Param
+
+func (opts Opts) AddOpt(param *Param, aliases ...string) *Opts {
+
+	names := append([]string{param.name}, aliases...)
+	for _, name := range names {
+		opts[name] = param
+	}
+
+	return &opts
+}
+
 // Mapping of a Param name to it's assigned value.
 //
 type ValueMap map[string]string
