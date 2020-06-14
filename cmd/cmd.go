@@ -54,7 +54,11 @@ func NewParam(name, desc string, v Validator) *Param {
 //
 type Opts map[string]*Param
 
-func (opts Opts) AddOpt(param *Param, aliases ...string) Opts {
+func NewOpts() Opts {
+	return Opts{}
+}
+
+func (opts Opts) Add(param *Param, aliases ...string) Opts {
 
 	names := append([]string{param.name}, aliases...)
 	for _, name := range names {
@@ -64,7 +68,7 @@ func (opts Opts) AddOpt(param *Param, aliases ...string) Opts {
 	return opts
 }
 
-func (opts Opts) AddOpts(o Opts) Opts {
+func (opts Opts) Merge(o Opts) Opts {
 
 	for n, p := range o {
 		opts[n] = p

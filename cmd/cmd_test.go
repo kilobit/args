@@ -100,10 +100,15 @@ func TestOpts(t *testing.T) {
 
 	opt1 := NewParam("opt1", "Test Option 1", nil)
 	opt2 := NewParam("opt2", "Test Option 2", nil)
+	opt3 := NewParam("opt3", "Test Option 3", nil)
 
-	opts := Opts{}.AddOpt(opt1, "1", "2")
+	opts := NewOpts().Add(opt1, "1", "2")
 
-	opts.AddOpt(opt2, "2", "3")
+	opts.Add(opt2, "2", "3")
+
+	opts2 := NewOpts().Add(opt3, "3", "4")
+
+	opts.Merge(opts2)
 
 	//t.Logf("%#v", opts)
 
@@ -111,7 +116,8 @@ func TestOpts(t *testing.T) {
 	assert.Expect(t, opts["opt2"], opt2)
 	assert.Expect(t, opts["1"], opt1)
 	assert.Expect(t, opts["2"], opt2)
-	assert.Expect(t, opts["3"], opt2)
+	assert.Expect(t, opts["3"], opt3)
+	assert.Expect(t, opts["4"], opt3)
 }
 
 func TestArgs(t *testing.T) {
