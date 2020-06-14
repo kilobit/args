@@ -1,6 +1,6 @@
 /* Copyright 2020 Kilobit Labs Inc. */
 
-// Command processor and runner.
+// High level command line processing utilities.
 //
 package cmd // import "kilobit.ca/go/args/cmd"
 
@@ -13,8 +13,11 @@ import . "kilobit.ca/go/args"
 //
 type Validator func(value string) error
 
+// Returns valid for any string.
 func Any(value string) error { return nil }
 
+// Returns valid if the argument matches one of the provided opts.
+//
 func OneOf(opts ...string) Validator {
 
 	m := map[string]struct{}{}
@@ -108,54 +111,19 @@ func (args *Args) Concat(as *Args) *Args {
 //
 type ValueMap map[string]string
 
-// Interface for running Command actions.  Can also be satisfied with
-// a CmdHandler.
-//
-type CmdRunner interface {
-	RunCommand(params ValueMap, rest []string) error
-}
-
-// A function type that performs the Command action.  This type
-// satisfies the CmdRunner interface.
-//
-// The params is a map of the named options and args.
-//
-type CmdRunnerFunc func(params ValueMap, rest []string) error
-
-func (h CmdRunnerFunc) RunCommand(params ValueMap, rest []string) error {
-	return h(params, rest)
-}
-
-// Type representing a command, it's parameters and meta data.
-//
-type Command struct {
-	name   string
-	desc   string
-	opts   Opts
-	args   *Args
-	runner CmdRunner
-}
-
-func New(name, desc string, opts Opts, args *Args, runner CmdRunner) *Command {
-
-	cmd := Command{name, desc, opts, args, runner}
-
-	return &cmd
-}
-
-// Run a command via it's handler.
+// Parse a command line command.
 //
 // A nil args will default to os.Args.
 //
-func (cmd *Command) Run(args []string) error {
+func Parse(cmd []string, opts Opts, args *Args) (params ValueMap, rest []string, err error) {
 
-	ap := NewArgParser(args)
-	params := ValueMap{}
+	ap := NewArgParser(cmd)
+	params = ValueMap{}
 
-	for n := range ap.NextOptC() {
-		opt, ok := cmd.opts[n]
+	for o := range ap.NextOptC() {
+		opt, ok := opts[o]
 		if !ok {
-			return fmt.Errorf("Unknown option, '%s'.", n)
+			return nil, nil, fmt.Errorf("Unknown option, '%s'.", o)
 		}
 
 		arg := ""
@@ -163,7 +131,7 @@ func (cmd *Command) Run(args []string) error {
 			arg = ap.NextArg()
 			err := opt.v(arg)
 			if err != nil {
-				return fmt.Errorf("Option error, %s: %s", n, err)
+				return nil, nil, fmt.Errorf("Option error, %s: %s", o, err)
 			}
 		}
 
@@ -171,19 +139,22 @@ func (cmd *Command) Run(args []string) error {
 	}
 
 	// Check number of arguments.
+	if len(ap.Args()) < len(*args) {
+		return nil, nil, fmt.Errorf("Insufficient arguments, expected %d, got %d", len(*args), len(ap.Args()))
+	}
 
-	for _, arg := range *cmd.args {
+	for _, arg := range *args {
 
 		param := ap.NextArg()
 		if arg.v != nil {
 			err := arg.v(param)
 			if err != nil {
-				return fmt.Errorf("Argument error, %s: %s", arg.name, err)
+				return nil, nil, fmt.Errorf("Argument error, %s: %s", arg.name, err)
 			}
 		}
 
 		params[arg.name] = param
 	}
 
-	return cmd.runner.RunCommand(params, ap.Args())
+	return params, ap.Args(), nil
 }
