@@ -30,7 +30,7 @@ func TestParseCmd(t *testing.T) {
 	args := NewArgs(NewParam("hello", "A test argument", nil))
 
 	params, rest, err := Parse(
-		[]string{"--verbose", "-f", "bar", "Hello World!", "rest1", "rest2"},
+		[]string{"--verbose", "-f", "bar", "Hello World!", "rest1", "--rest2", "rest3"},
 		opts, args,
 	)
 	if err != nil {
@@ -41,7 +41,7 @@ func TestParseCmd(t *testing.T) {
 	assert.Expect(t, "bar", params["foo"])
 	assert.Expect(t, "Hello World!", params["hello"])
 
-	assert.ExpectDeep(t, []string{"rest1", "rest2"}, rest)
+	assert.ExpectDeep(t, []string{"rest1", "--rest2", "rest3"}, rest)
 }
 
 func TestOneOfValidator(t *testing.T) {
