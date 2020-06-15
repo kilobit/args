@@ -28,7 +28,7 @@ func TestREPL(t *testing.T) {
 			args = append(args, arg)
 		}
 
-		t.Logf("%#v", args)
+		//t.Logf("%#v", args)
 
 		if len(args) != 5 {
 			t.Error("Wrong number of arguments in repl.")

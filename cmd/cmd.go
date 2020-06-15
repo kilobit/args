@@ -121,7 +121,12 @@ func Parse(cmd []string, opts Opts, args *Args) (params ValueMap, rest []string,
 	ap := NewArgParser(cmd)
 	params = ValueMap{}
 
-	for o := range ap.NextOptC() {
+	for {
+		o := ap.NextOpt()
+		if o == "" {
+			break
+		}
+
 		opt, ok := opts[o]
 		if !ok {
 			return nil, nil, fmt.Errorf("Unknown option, '%s'.", o)

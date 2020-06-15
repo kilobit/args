@@ -117,3 +117,26 @@ func TestOptWithArg(t *testing.T) {
 	Expect(t, "foo", arg)
 	Expect(t, "remain", p.Args()[0])
 }
+
+func TestInterleavedOptsArgs(t *testing.T) {
+
+	args := []string{"--name", "myname", "-s", "2048", "./sample.txt"}
+	ap := NewArgParser(args)
+
+	nameopt := ap.NextOpt()
+	Expect(t, "name", nameopt)
+
+	nameval := ap.NextArg()
+	Expect(t, "myname", nameval)
+
+	sizename := ap.NextOpt()
+	Expect(t, "s", sizename)
+
+	sizeval := ap.NextArg()
+	Expect(t, "2048", sizeval)
+
+	confval := ap.NextArg()
+	Expect(t, "./sample.txt", confval)
+
+	Expect(t, 0, len(ap.Args()))
+}

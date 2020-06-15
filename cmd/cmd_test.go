@@ -44,6 +44,32 @@ func TestParseCmd(t *testing.T) {
 	assert.ExpectDeep(t, []string{"rest1", "--rest2", "rest3"}, rest)
 }
 
+func TestParseMultiOptsCmd(t *testing.T) {
+
+	var optKeyName = NewParam("name", "The name of the key.", Any)
+	var optKeySize = NewParam("size", "The bit size of the key, defaulting to 2048.", Any)
+
+	var argConfig = NewParam("config", "Path to the configuration file.", Any)
+
+	var optsGenKey = NewOpts().Add(optKeyName, "n").Add(optKeySize, "s")
+	var argsGenKey = NewArgs(argConfig)
+
+	args := []string{"--name", "myname", "-s", "2048", "./sample.txt"}
+
+	params, rest, err := Parse(args, optsGenKey, argsGenKey)
+	if err != nil {
+		t.Error(err)
+	}
+
+	//t.Log(params)
+	//t.Log(rest)
+
+	assert.Expect(t, "myname", params["name"])
+	assert.Expect(t, "2048", params["size"])
+	assert.Expect(t, "./sample.txt", params["config"])
+	assert.ExpectDeep(t, []string{}, rest)
+}
+
 func TestOneOfValidator(t *testing.T) {
 
 	v := OneOf("one", "two", "three")

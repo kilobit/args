@@ -4,6 +4,7 @@
 //
 package args // import "kilobit.ca/go/args"
 
+import _ "fmt"
 import "os"
 import "strings"
 import "unicode/utf8"
@@ -147,6 +148,10 @@ func (ap *ArgParser) nextShopt() string {
 }
 
 // Channel version of the NextOpt method, useful for looping.
+//
+// This is useful when looping over a consistent set of options.  If
+// Options with arguments are interleaved, then using the non-channel
+// functions is more reliable.
 //
 func (ap *ArgParser) NextOptC() chan string {
 	c := make(chan string)
