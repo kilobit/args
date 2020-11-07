@@ -16,6 +16,7 @@ type Config map[string]interface{}
 func (c *Config) Write(w io.Writer) error {
 
 	enc := json.NewEncoder(w)
+	enc.SetIndent("", "  ")
 	return enc.Encode(c)
 }
 

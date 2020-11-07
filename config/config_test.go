@@ -5,9 +5,9 @@ package config // import "kilobit.ca/go/args/config"
 import "os"
 import "io/ioutil"
 import "strings"
-import "unicode"
 import "testing"
 import "kilobit.ca/go/tested/assert"
+import "encoding/json"
 
 func TestConfigTest(t *testing.T) {
 
@@ -36,20 +36,21 @@ func TestConfigWrite(t *testing.T) {
 
 		var w strings.Builder
 		err := data.exc.Write(&w)
-		if err != nil {
-			t.Error(err)
-		}
+		assert.Ok(t, err)
 
-		/*
-			t.Logf("%#v\n", strings.TrimFunc(data.s, unicode.IsSpace))
-			t.Logf("%#v\n", strings.TrimFunc(w.String(), unicode.IsSpace))
-		*/
+		// t.Log(w.String())
 
-		assert.Expect(
-			t,
-			strings.TrimFunc(data.s, unicode.IsSpace),
-			strings.TrimFunc(w.String(), unicode.IsSpace),
-		)
+		var obj interface{}
+		err = json.Unmarshal([]byte(w.String()), &obj)
+		assert.Ok(t, err)
+
+		// t.Log(data.s)
+
+		var exp interface{}
+		err = json.Unmarshal([]byte(data.s), &exp)
+		assert.Ok(t, err)
+
+		assert.ExpectDeep(t, exp, obj)
 	}
 }
 
